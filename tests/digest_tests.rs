@@ -12,6 +12,16 @@
 // OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 // CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+#![no_std]
+#![cfg(feature = "alloc")]
+
+extern crate alloc;
+
+use alloc::{format, vec::Vec};
+
+#[cfg(not(debug_assertions))]
+use alloc::vec;
+
 use ring::{digest, test, test_file};
 
 #[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
@@ -47,6 +57,8 @@ fn digest_misc() {
 }
 
 mod digest_shavs {
+    use alloc::{format, vec::Vec};
+
     use ring::{digest, test};
 
     fn run_known_answer_test(digest_alg: &'static digest::Algorithm, test_file: test::File) {
