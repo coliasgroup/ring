@@ -87,7 +87,7 @@ fn aes_gcm_seal(
     let mut ctr = Counter::one(nonce);
     let tag_iv = ctr.increment();
 
-    #[cfg(target_arch = "x86_64")]
+    #[cfg(all(perlasm, target_arch = "x86_64"))]
     let in_out = {
         if !aes_key.is_aes_hw(cpu_features) || !auth.is_avx() {
             in_out
@@ -122,7 +122,7 @@ fn aes_gcm_seal(
         }
     };
 
-    #[cfg(target_arch = "aarch64")]
+    #[cfg(all(perlasm, target_arch = "aarch64"))]
     let in_out = {
         if !aes_key.is_aes_hw(cpu_features) || !auth.is_clmul() {
             in_out
@@ -207,7 +207,7 @@ fn aes_gcm_open(
 
     let in_prefix_len = src.start;
 
-    #[cfg(target_arch = "x86_64")]
+    #[cfg(all(perlasm, target_arch = "x86_64"))]
     let in_out = {
         if !aes_key.is_aes_hw(cpu_features) || !auth.is_avx() {
             in_out
@@ -242,7 +242,7 @@ fn aes_gcm_open(
         }
     };
 
-    #[cfg(target_arch = "aarch64")]
+    #[cfg(all(perlasm, target_arch = "aarch64"))]
     let in_out = {
         if !aes_key.is_aes_hw(cpu_features) || !auth.is_clmul() {
             in_out
