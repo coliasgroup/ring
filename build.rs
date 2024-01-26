@@ -262,6 +262,12 @@ const MACOS_ABI: &[&str] = &["ios", MACOS, "tvos"];
 const MACOS: &str = "macos";
 const WINDOWS: &str = "windows";
 
+fn find_asm_target(target: &Target) -> Option<&'static AsmTarget> {
+    ASM_TARGETS.iter().find(|asm_target| {
+        asm_target.arch == target.arch && asm_target.oss.contains(&target.os.as_ref())
+    })
+}
+
 fn main() {
     // Avoid assuming the working directory is the same is the $CARGO_MANIFEST_DIR so that toolchains
     // which may assume other working directories can still build this code.
@@ -284,6 +290,11 @@ fn main() {
         &env::var("CARGO_MANIFEST_LINKS").unwrap(),
         &core_name_and_version
     );
+
+    match find_asm_target(target) {
+        Some(_) => println!("cargo:rustc-cfg=no_perlasm"),
+        None => println!("cargo:rustc-cfg=perlasm"),
+    }
 
     const RING_PREGENERATE_ASM: &str = "RING_PREGENERATE_ASM";
     match env::var_os(RING_PREGENERATE_ASM).as_deref() {
@@ -324,9 +335,7 @@ fn ring_build_rs_main(c_root_dir: &Path, core_name_and_version: &str) {
         force_warnings_into_errors,
     };
 
-    let asm_target = ASM_TARGETS.iter().find(|asm_target| {
-        asm_target.arch == target.arch && asm_target.oss.contains(&target.os.as_ref())
-    });
+    let asm_target = find_asm_target(&target);
 
     // If `.git` exists then assume this is the "local hacking" case where
     // we want to make it easy to build *ring* using `cargo build`/`cargo test`
@@ -590,6 +599,10 @@ fn configure_cc(c: &mut cc::Build, target: &Target, c_root_dir: &Path, include_d
 
     if target.force_warnings_into_errors {
         c.warnings_into_errors(true);
+    }
+
+    if find_asm_target(target).is_none() {
+        let _ = c.define("OPENSSL_NO_ASM", "1");
     }
 }
 
