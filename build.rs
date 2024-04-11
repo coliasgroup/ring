@@ -317,8 +317,8 @@ fn main() {
     );
 
     match find_asm_target(&get_target(is_git)) {
-        Some(_) => println!("cargo:rustc-cfg=no_perlasm"),
-        None => println!("cargo:rustc-cfg=perlasm"),
+        Some(_) => println!("cargo:rustc-cfg=perlasm"),
+        None => println!("cargo:rustc-cfg=no_perlasm"),
     }
 
     const RING_PREGENERATE_ASM: &str = "RING_PREGENERATE_ASM";
