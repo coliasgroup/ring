@@ -254,6 +254,8 @@ const LINUX_ABI: &[&str] = &[
     "linux",
     "redox",
     "solaris",
+    #[cfg(feature = "less-correct-none-os-has-linux-abi")]
+    "none",
 ];
 
 /// Operating systems that have the same ABI as macOS on every architecture
